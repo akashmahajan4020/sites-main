@@ -11,6 +11,7 @@ window.UNIVERSE_DATA = {
   heroHeading: 'Happy Birthday, Shivani 💗',
   heroText: "Out of all the people life could have introduced me to, I’m genuinely glad it introduced me to you.",
   heroDetail: 'This little world is filled with memories, laughter, adventures, and a few things I wanted to tell you.',
+  specialDate: '2026-10-29',
   intro: [
     'Some people become a beautiful part of your story without even realizing it.',
     'And sometimes, someone deserves a little universe of their own.',
@@ -25,11 +26,8 @@ window.UNIVERSE_DATA = {
   ],
   // Media imported from /uploads. Keep filenames unchanged when adding more files.
   media: [
-    { type: 'image', src: 'uploads/a10d4a1c-ee12-42b6-8b53-d3069079e53a.png', category: 'cafe-diaries', title: 'A bright café day', caption: 'A little sunshine and a very lovely smile.', date: '2026-10-18', featured: true, hero: true, favorite: true },
     { type: 'image', src: 'uploads/Vibrant Garba Night Festival.png', category: 'surat-garba-nights', title: 'Under the Garba lights', caption: 'A night full of colour, music, and sparkle.', date: '2026-10-18', favorite: true },
-    { type: 'image', src: 'uploads/47320bc0-a2ec-4840-b958-f0fa765f1016.png', category: 'cafe-diaries', title: 'Café glow', caption: 'One of those easy, happy afternoons.', date: '2026-10-18' },
-    { type: 'image', src: 'uploads/e3ceca42-b4fa-4445-bc73-1cc8b2cd5ab4.png', category: 'cafe-diaries', title: 'A little pose', caption: 'Keeping the small moments close.', date: '2026-10-18' },
-    { type: 'image', src: 'uploads/Screenshot_2026-10-29-14-43-05-37_1c337646f29875672b5a61192b9010f9.jpg', category: 'cafe-diaries', title: 'A little mural moment', caption: 'Bright colours and an even brighter smile.', date: '2026-10-29', favorite: true },
+    { type: 'image', src: 'uploads/Screenshot_2026-10-29-14-43-05-37_1c337646f29875672b5a61192b9010f9.jpg', category: 'cafe-diaries', title: 'A little mural moment', caption: 'Bright colours and an even brighter smile.', date: '2026-10-29', featured: true, hero: true, favorite: true },
     { type: 'image', src: 'uploads/ChatGPT Image Sep 23, 2026, 10_46_18 AM.png', category: 'favorite-memories', title: 'A beautiful traditional look', caption: 'A favourite portrait, full of warmth.', date: '2026-09-23', favorite: true },
     { type: 'image', src: 'uploads/IMG-20261018-WA0012.jpg', category: 'surat-garba-nights', title: 'A night in colour', caption: 'One frame from an unforgettable evening.', date: '2026-10-18' },
     { type: 'image', src: 'uploads/IMG_0156.JPG', category: 'game-zone-madness', title: 'Game-zone selfie', caption: 'A playful little moment together.', date: '2026-10-22', favorite: true },
@@ -72,6 +70,21 @@ window.UNIVERSE_DATA = {
     { prompt: 'Which type of place have we visited together?', options: ['A library', 'A café', 'A stadium', 'An aquarium'], correct: 1 },
     { prompt: 'Which city was our recent Garba outing in?', options: ['Vadodara', 'Surat', 'Rajkot', 'Ahmedabad'], correct: 1 },
     { prompt: 'Which section holds game-zone videos?', options: ['The Replay Room', 'The Letter Desk', 'The Star Map', 'The Café Table'], correct: 0 }
+  ],
+  quizSurprise: {
+    title: 'You found every little piece of the story.',
+    message: 'Shivani, you make ordinary days feel like memories worth keeping. Here is to more laughter, more music, more cafés, and more beautiful little moments ahead. — Akash'
+  },
+  memoryMap: [
+    { kind: 'café', title: 'Café diaries', note: 'Coffee, colour, and the kind of conversations that make an afternoon disappear.', x: 24, y: 64 },
+    { kind: 'garba', title: 'Garba under the lights', note: 'Surat, Navratri, music, and a night that deserved to be remembered.', x: 70, y: 30 },
+    { kind: 'heart', title: 'The game-zone', note: 'A playful stop for laughs, replays, and a few very good selfies.', x: 56, y: 71 },
+    { kind: 'star', title: 'The little moments', note: 'All the unplanned snapshots that became part of the story.', x: 84, y: 62 }
+  ],
+  playlist: [
+    { title: 'Heeriye', artist: 'Jasleen Royal ft. Arijit Singh', mood: 'For warm, easy days' },
+    { title: 'Iktara', artist: 'Kavita Seth', mood: 'For quiet, golden moments' },
+    { title: 'Ilahi', artist: 'Arijit Singh', mood: 'For every next adventure' }
   ],
   ideas: [
     ['More café visits', 'A possibility for another lovely chapter.'],
