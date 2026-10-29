@@ -12,7 +12,7 @@ function memoryCard(item) {
   return `<article class="memory reveal" data-category="${escapeHtml(item.category || '')}" data-date="${escapeHtml(item.date || '')}" data-src="${escapeHtml(item.src)}" data-caption="${escapeHtml(item.caption || item.title || '')}"><div class="memory-image"><img loading="lazy" src="${escapeHtml(item.src)}" alt="${escapeHtml(item.caption || item.title || 'Memory')}"><span class="memory-open" aria-hidden="true">↗</span></div><div class="meta"><h3>${escapeHtml(item.title || 'A little memory')}</h3><small>${escapeHtml(item.caption || '')}</small></div></article>`;
 }
 function videoCard(item) {
-  return `<article class="memory reveal"><video controls preload="metadata" src="${escapeHtml(item.src)}" aria-label="${escapeHtml(item.caption || item.title || 'Video memory')}"></video><div class="meta"><h3>${escapeHtml(item.title || 'Replay')}</h3><small>${escapeHtml(item.caption || '')}</small></div></article>`;
+  return `<article class="memory reveal"><video controls muted playsinline preload="metadata" src="${escapeHtml(item.src)}" aria-label="${escapeHtml(item.caption || item.title || 'Video memory')}"></video><div class="meta"><h3>${escapeHtml(item.title || 'Replay')}</h3><small>${escapeHtml(item.caption || '')}</small></div></article>`;
 }
 function renderSite() {
   document.title = `Happy Birthday ${data.herName} | A Little Universe by ${data.myName}`;
@@ -36,6 +36,55 @@ function renderSite() {
 }
 
 renderSite();
+const replayHeading = document.querySelector('.replay-heading');
+if (replayHeading && document.querySelectorAll('.video-grid video').length) {
+  const soundtrackButton = document.createElement('button');
+  soundtrackButton.className = 'ghost soundtrack-toggle';
+  soundtrackButton.type = 'button';
+  soundtrackButton.setAttribute('aria-pressed', 'false');
+  soundtrackButton.innerHTML = '<span aria-hidden="true">♫</span> Play soft soundtrack';
+  replayHeading.append(soundtrackButton);
+
+  let audioContext;
+  let soundtrackTimer;
+  let soundtrackPlaying = false;
+  const playNote = (context, destination, frequency, start, length, volume) => {
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, start);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(volume, start + .08);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + length);
+    oscillator.connect(gain).connect(destination);
+    oscillator.start(start);
+    oscillator.stop(start + length + .04);
+  };
+  const playSoundtrackPhrase = () => {
+    if (!soundtrackPlaying || !audioContext) return;
+    const notes = [293.66, 369.99, 440, 587.33, 261.63, 329.63, 392, 523.25, 293.66, 369.99, 440, 659.25];
+    const start = audioContext.currentTime + .05;
+    notes.forEach((note, index) => playNote(audioContext, audioContext.destination, note, start + index * .62, 1.16, .045));
+    soundtrackTimer = window.setTimeout(playSoundtrackPhrase, notes.length * 620);
+  };
+  soundtrackButton.addEventListener('click', async () => {
+    document.querySelectorAll('.video-grid video').forEach(video => { video.muted = true; video.defaultMuted = true; });
+    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (soundtrackPlaying) {
+      soundtrackPlaying = false;
+      window.clearTimeout(soundtrackTimer);
+      await audioContext.suspend();
+      soundtrackButton.setAttribute('aria-pressed', 'false');
+      soundtrackButton.innerHTML = '<span aria-hidden="true">♫</span> Play soft soundtrack';
+      return;
+    }
+    await audioContext.resume();
+    soundtrackPlaying = true;
+    playSoundtrackPhrase();
+    soundtrackButton.setAttribute('aria-pressed', 'true');
+    soundtrackButton.innerHTML = '<span aria-hidden="true">♫</span> Pause soundtrack';
+  });
+}
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const intro = $('#intro'), lines = $$('.intro .line');

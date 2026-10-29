@@ -68,6 +68,8 @@ body{overflow-x:clip}
 @media(prefers-reduced-motion:reduce){
   .hero:before,.hero:after,.hero-aurora:before{animation:none!important;transition:none!important}
 }
+.soundtrack-toggle{margin-top:1.1rem;padding:9px 12px;font-size:.7rem;letter-spacing:.04em}
+.soundtrack-toggle[aria-pressed="true"]{background:rgba(231,201,120,.12);border-color:var(--gold);color:var(--gold)}
 
 /* Opening screen: matched to the supplied cosmic editorial reference. */
 .intro{background:radial-gradient(ellipse 47% 42% at 50% 96%,rgba(113,48,100,.68),transparent 100%),radial-gradient(ellipse 56% 52% at 8% -3%,rgba(38,35,91,.78),transparent 100%),#080616}
