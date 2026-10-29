@@ -103,6 +103,11 @@ body{overflow-x:clip}
 .skip{top:24px;right:26px}
 @media(max-width:500px){.intro-inner{padding:1.2rem}.intro .line{font-size:clamp(2.2rem,10.5vw,3.35rem);line-height:.91}.intro .eyebrow{margin-bottom:1rem}.intro-actions{margin-top:1.35rem}.skip{top:12px;right:12px}}
 
+/* Never allow the welcome layer to permanently trap the page if a browser blocks an enhancement. */
+.intro{animation:intro-failsafe 0s 15s forwards}
+.intro.out{animation:none;pointer-events:none}
+@keyframes intro-failsafe{to{opacity:0;visibility:hidden;pointer-events:none}}
+
 /* Keepsakes: the map, private replies, reactions, and the quiz finale. */
 .stars{background-position:var(--visit-star-x,0) var(--visit-star-y,0),calc(19px + var(--visit-star-x,0px)) calc(42px + var(--visit-star-y,0px)),calc(71px - var(--visit-star-x,0px)) calc(83px + var(--visit-star-y,0px));opacity:var(--visit-star-opacity,.45);filter:hue-rotate(var(--visit-sky-hue,0deg));transition:background-position 1.2s var(--ease),filter 1.2s ease}
 .memory-map-section{overflow:hidden;background:radial-gradient(ellipse at 22% 85%,rgba(102,59,125,.38),transparent 39%),linear-gradient(135deg,#10102a,#0e0a20 61%,#211135)}

@@ -37,6 +37,19 @@ function renderSite() {
 
 renderSite();
 
+// These controls must work even if an optional enhancement (audio, local storage,
+// or a browser-specific API) is unavailable. Bind them before every enhancement.
+function dismissIntroImmediately() {
+  document.getElementById('intro')?.classList.add('out');
+  try { sessionStorage.setItem('universe-intro', 'seen'); } catch {}
+}
+document.addEventListener('click', event => {
+  if (event.target.closest('#enter, #skip')) dismissIntroImmediately();
+}, { capture: true });
+try {
+  if (sessionStorage.getItem('universe-intro') === 'seen' || new URLSearchParams(window.location.search).has('skip-intro')) dismissIntroImmediately();
+} catch {}
+
 // A few interactive keepsakes are deliberately stored only on the visitor's device.
 const mapPins = (data.memoryMap || []).map((place, index) => `<button class="map-pin pin-${escapeHtml(place.kind || 'star')}" style="--x:${Number(place.x) || 50}%;--y:${Number(place.y) || 50}%" data-title="${escapeHtml(place.title)}" data-note="${escapeHtml(place.note)}" aria-expanded="false"><span class="pin-icon" aria-hidden="true">${place.kind === 'café' ? '&#9749;' : place.kind === 'garba' ? '&#10022;' : place.kind === 'heart' ? '&#9829;' : '&#10023;'}</span><span class="pin-label">${pad(index + 1)} - ${escapeHtml(place.title)}</span></button>`).join('');
 document.querySelector('#chapters')?.insertAdjacentHTML('afterend', `<section class="section memory-map-section" id="memory-map"><div class="section-heading reveal"><p class="eyebrow">PLACES WITH A STORY</p><h2>A map of our<br><em>little universe.</em></h2><p class="intro-copy">A few pins for the places that gave us something lovely to remember. Tap a pin to open its tiny story.</p></div><div class="memory-map reveal" aria-label="Map of memory places"><div class="map-orbit orbit-one"></div><div class="map-orbit orbit-two"></div>${mapPins}<div class="map-copy" aria-live="polite"><p class="eyebrow">CHOOSE A PIN</p><h3>Every place holds a feeling.</h3><p>Start anywhere on the map.</p></div></div></section>`);
@@ -229,8 +242,10 @@ function showIntroLine() {
     window.setTimeout(exitIntro, 2600);
   }
 }
-function exitIntro() { intro?.classList.add('out'); sessionStorage.setItem('universe-intro', 'seen'); }
-if (sessionStorage.getItem('universe-intro') === 'seen' || new URLSearchParams(window.location.search).has('skip-intro')) exitIntro();
+function exitIntro() { intro?.classList.add('out'); try { sessionStorage.setItem('universe-intro', 'seen'); } catch {} }
+let hasSeenIntro = false;
+try { hasSeenIntro = sessionStorage.getItem('universe-intro') === 'seen'; } catch {}
+if (hasSeenIntro || new URLSearchParams(window.location.search).has('skip-intro')) exitIntro();
 else window.setTimeout(showIntroLine, 1350);
 $('#enter')?.addEventListener('click', exitIntro); $('#skip')?.addEventListener('click', exitIntro);
 const meter = $('.scroll-meter span'), nav = $('nav');
