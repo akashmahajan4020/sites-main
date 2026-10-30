@@ -8,8 +8,58 @@ const garba = images.find(item => item.category === 'surat-garba-nights');
 const universeLabel = data.nickname ? `A LITTLE UNIVERSE CALLED ${data.nickname.toUpperCase()}` : 'A LITTLE UNIVERSE';
 const emptyGallery = '<div class="empty reveal"><p class="eyebrow">THE ARCHIVE IS OPEN</p><h3>Waiting for the first memory.</h3><p>Add photos to <code>uploads/</code>, then list them in <code>assets/site-data.js</code>.</p></div>';
 
+function formatCardDate(isoDate) {
+  if (!isoDate) return 'A golden day';
+  try {
+    const [year, month, day] = isoDate.split('-');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const m = months[parseInt(month, 10) - 1] || month;
+    return `${m} ${parseInt(day, 10)}, ${year}`;
+  } catch {
+    return isoDate;
+  }
+}
+
 function memoryCard(item, index) {
-  return `<article class="memory reveal" data-category="${escapeHtml(item.category || '')}" data-date="${escapeHtml(item.date || '')}" data-src="${escapeHtml(item.src)}" data-caption="${escapeHtml(item.caption || item.title || '')}"><div class="memory-image"><img loading="lazy" src="${escapeHtml(item.src)}" alt="${escapeHtml(item.caption || item.title || 'Memory')}"><span class="memory-open" aria-hidden="true">↗</span></div><div class="meta"><h3>${escapeHtml(item.title || 'A little memory')}</h3><small>${escapeHtml(item.caption || '')}</small></div></article>`;
+  const formattedDate = formatCardDate(item.date);
+  return `<article class="memory memory-card reveal" data-category="${escapeHtml(item.category || '')}" data-date="${escapeHtml(item.date || '')}" data-src="${escapeHtml(item.src)}" data-caption="${escapeHtml(item.caption || item.title || '')}" data-memory-id="${index}">
+  <div class="card-inner">
+    <div class="card-face card-front">
+      <div class="card-photo-wrap" role="button" tabindex="0" aria-label="Open ${escapeHtml(item.title || 'memory')}">
+        <img loading="lazy" src="${escapeHtml(item.src)}" alt="${escapeHtml(item.caption || item.title || 'Memory')}">
+        <button class="card-zoom-btn" type="button" aria-label="Enlarge photo"><span aria-hidden="true">↗</span></button>
+      </div>
+      <div class="card-meta">
+        <div class="card-meta-text">
+          <span class="card-date-badge">${escapeHtml(formattedDate)}</span>
+          <h3>${escapeHtml(item.title || 'A little memory')}</h3>
+          <small>${escapeHtml(item.caption || '')}</small>
+        </div>
+        <button class="card-flip-btn" type="button" aria-label="Read personal note for this memory"><span class="flip-icon" aria-hidden="true">✦</span><span class="flip-text">Note</span></button>
+      </div>
+    </div>
+    <div class="card-face card-back" aria-hidden="true">
+      <div class="card-back-header">
+        <div class="card-postmark">
+          <span class="postmark-stars">✦ ✦ ✦</span>
+          <strong>UNIVERSE ARCHIVE</strong>
+          <small>${escapeHtml(item.date || 'SPECIAL MOMENT')}</small>
+        </div>
+        <div class="card-stamp" aria-hidden="true">★</div>
+      </div>
+      <div class="card-back-body">
+        <span class="card-note-label">A MOMENT TO REMEMBER</span>
+        <h4>${escapeHtml(item.title || 'A little memory')}</h4>
+        <p class="card-handwritten">"${escapeHtml(item.caption || 'A moment worth keeping close.')}"</p>
+        <div class="card-sign">— Akash &amp; Shivani ✦</div>
+      </div>
+      <div class="card-back-footer">
+        <button class="card-flip-btn back-flip-btn" type="button"><span aria-hidden="true">↺</span> Photo</button>
+        <button class="card-enlarge-btn" type="button">Enlarge <span aria-hidden="true">↗</span></button>
+      </div>
+    </div>
+  </div>
+</article>`;
 }
 function videoCard(item) {
   return `<article class="memory video-memory reveal" data-video-src="${escapeHtml(item.src)}" data-video-title="${escapeHtml(item.title || 'Replay')}" data-video-caption="${escapeHtml(item.caption || '')}"><video controls muted playsinline preload="metadata" src="${escapeHtml(item.src)}" aria-label="${escapeHtml(item.caption || item.title || 'Video memory')}"></video><div class="meta"><h3>${escapeHtml(item.title || 'Replay')}</h3><small>${escapeHtml(item.caption || '')}</small><button class="video-cinema" type="button">Watch in cinema <span aria-hidden="true">↗</span></button></div></article>`;
@@ -24,12 +74,12 @@ function renderSite() {
 <header class="hero" id="top"><div class="stars"></div><div class="hero-aurora"></div><div class="hero-grain"></div><div class="hero-content reveal"><p class="eyebrow">${escapeHtml(universeLabel)}</p><h1>${escapeHtml(data.heroHeading)}</h1><p class="lead">${escapeHtml(data.heroText)}</p><p class="hero-detail">${escapeHtml(data.heroDetail)}</p><div class="hero-actions"><a class="button" href="#chapters">Discover the story <span aria-hidden="true">↓</span></a><a class="text-link" href="#memories">Open the gallery <span aria-hidden="true">↗</span></a></div><p class="scroll-prompt"><span></span>Scroll to begin</p></div><div class="hero-photo ${hero ? '' : 'empty'}"><div class="hero-photo-frame">${hero ? `<img src="${escapeHtml(hero.src)}" alt="${escapeHtml(hero.caption || hero.title || 'Featured memory')}">` : ''}</div><p class="hero-photo-caption">${escapeHtml(hero?.caption || hero?.title || 'A favorite memory, waiting to be added')}</p></div><div class="hero-index" aria-hidden="true"><span>01</span><i></i><span>∞</span></div></header>
 <main>
 <section class="section chapters-section" id="chapters"><div class="section-heading reveal"><p class="eyebrow">OUR JOURNEY SO FAR</p><h2>A few chapters<br>of <em>us.</em></h2><p class="intro-copy">A friendship told through the little moments, growing closeness, and memories still waiting to be made.</p></div><div class="timeline" aria-label="Story chapters">${data.chapters.map((chapter, i) => `<article class="chapter reveal"><span class="num">${pad(i + 1)}</span><div><p class="eyebrow">${escapeHtml(chapter[1])}</p><h3>${escapeHtml(chapter[0])}</h3><p>${escapeHtml(chapter[2])}</p></div></article>`).join('')}</div></section>
-<section class="section memories-section" id="memories"><div class="section-heading split-heading reveal"><div><p class="eyebrow">THE MEMORY VAULT</p><h2>Proof that the<br>little things <em>matter.</em></h2></div><p class="intro-copy">Every picture holds a piece of the story we keep returning to.</p></div><div class="gallery-tools reveal"><div class="filter-scroll"><button class="filter active" data-filter="all">All memories</button>${data.categories.map(category => `<button class="filter" data-filter="${escapeHtml(category.slug)}">${escapeHtml(category.name)}</button>`).join('')}</div><div class="gallery-inputs"><input id="gallery-search" type="search" placeholder="Find a memory" aria-label="Search memory captions"><select id="gallery-sort" aria-label="Sort memories"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="date">Memory date</option></select></div></div>${images.length ? `<div class="media-grid" id="gallery">${images.map(memoryCard).join('')}</div>` : emptyGallery}</section>
+<section class="section memories-section" id="memories"><div class="section-heading split-heading reveal"><div><p class="eyebrow">THE MEMORY VAULT</p><h2>Proof that the<br>little things <em>matter.</em></h2></div><p class="intro-copy">Every photo turns over like a physical Polaroid keepsake. Tap a photo or Flip Note to see the note on the back.</p></div><div class="gallery-tools reveal"><div class="filter-scroll"><button class="filter active" data-filter="all">All memories</button>${data.categories.map(category => `<button class="filter" data-filter="${escapeHtml(category.slug)}">${escapeHtml(category.name)}</button>`).join('')}</div><div class="gallery-inputs"><input id="gallery-search" type="search" placeholder="Find a memory" aria-label="Search memory captions"><select id="gallery-sort" aria-label="Sort memories"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="date">Memory date</option></select></div></div>${images.length ? `<div class="media-grid" id="gallery">${images.map(memoryCard).join('')}</div>` : emptyGallery}</section>
 <section class="section gamezone" id="gamezone"><div class="section-heading reveal"><p class="eyebrow">PERSONAL ARCADE</p><h2>Press play on<br>the <em>good bits.</em></h2><p class="intro-copy">A little space for the games, the laughs, and the moments worth replaying.</p></div><div class="scoreboard reveal"><div class="score"><b>${data.media.length}</b><span>saved memories</span></div><div class="score"><b>${videos.length}</b><span>game videos</span></div><div class="score"><b>${images.filter(item => item.favorite).length}</b><span>favorites</span></div><div class="score"><b>${data.chapters.length}</b><span>chapters</span></div></div><div class="replay-heading reveal"><p class="eyebrow">NOW PLAYING</p><h3>The replay room</h3></div>${videos.length ? `<div class="media-grid video-grid">${videos.map(videoCard).join('')}</div>` : `<div class="empty reveal">Game-zone videos will appear here after ${escapeHtml(data.myName || 'a friend')} adds them.</div>`}</section>
 <section class="section garba" id="garba"><div class="garba-showcase"><div class="garba-photo reveal">${garba ? `<img loading="lazy" src="${escapeHtml(garba.src)}" alt="${escapeHtml(garba.caption || 'An evening in Surat')}">` : '<div class="empty">Garba photographs will glow here.</div>'}</div><div class="garba-copy reveal"><p class="eyebrow">SURAT, NAVRATRI</p><h2>That night<br>in <em>Surat.</em></h2><p>A little color, a little music, and another memory to keep close. The kind of night that deserves its own page.</p><a href="#memories" class="text-link">Visit the complete gallery <span aria-hidden="true">↗</span></a></div></div></section>
-<section class="section notes-section" id="notes"><div class="section-heading reveal"><p class="eyebrow">HIDDEN ENVELOPES</p><h2>A few little things<br>I want you to <em>know.</em></h2></div><div class="envelopes">${data.notes.map((note, i) => `<button class="envelope reveal" data-title="${escapeHtml(note[0])}" data-message="${escapeHtml(note[1])}"><span>Note ${pad(i + 1)}</span><strong>${escapeHtml(note[0])}</strong><i aria-hidden="true">↗</i></button>`).join('')}</div></section>
+<section class="section notes-section" id="notes"><div class="section-heading reveal"><p class="eyebrow">HIDDEN ENVELOPES</p><h2>A few little things<br>I want you to <em>know.</em></h2><p class="intro-copy">Tap any wax-sealed envelope to unfold the keepsake note inside.</p></div><div class="envelopes">${data.notes.map((note, i) => `<div class="envelope reveal" data-title="${escapeHtml(note[0])}" data-message="${escapeHtml(note[1])}" data-note-index="${i + 1}" role="button" tabindex="0" aria-label="Open Note ${pad(i + 1)}: ${escapeHtml(note[0])}"><div class="envelope-inner"><div class="envelope-flap" aria-hidden="true"><div class="flap-triangle"></div><div class="flap-seal"><span>✦</span></div></div><div class="envelope-letter-peek" aria-hidden="true"><span class="peek-tag">NOTE ${pad(i + 1)}</span><span class="peek-line"></span><span class="peek-line short"></span></div><div class="envelope-pocket"><div class="envelope-info"><span class="envelope-tag">NOTE ${pad(i + 1)}</span><strong>${escapeHtml(note[0])}</strong></div><div class="envelope-cue"><span>Unfold note</span><i aria-hidden="true">↗</i></div></div></div></div>`).join('')}</div></section>
 <section class="section quiz-section" id="quiz"><div class="quiz-layout"><div class="section-heading reveal"><p class="eyebrow">A TINY GAME</p><h2>How well do you remember the <em>good bits?</em></h2></div><div class="quizbox reveal"><p class="eyebrow" id="quiz-progress">Ready when you are</p><h3 id="quiz-prompt">A little memory challenge, just for fun.</h3><div id="quiz-options"></div><button id="quiz-start">Start challenge <span aria-hidden="true">→</span></button></div></div></section>
-<section class="section constellation-section"><div class="section-heading reveal"><p class="eyebrow">THE FUTURE CONSTELLATION</p><h2>Memories we haven't<br>made <em>yet.</em></h2><p class="intro-copy">Not promises—just lovely possibilities, floating somewhere ahead.</p></div><div class="constellation">${data.ideas.map((idea, i) => `<button class="star-card reveal" aria-expanded="false"><span class="star-number">${pad(i + 1)}</span><strong>${escapeHtml(idea[0])}</strong><p>${escapeHtml(idea[1])}</p><i aria-hidden="true">+</i></button>`).join('')}</div></section>
+<section class="section constellation-section"><div class="section-heading reveal"><p class="eyebrow">THE FUTURE CONSTELLATION</p><h2>Memories we haven't<br>made <em>yet.</em></h2><p class="intro-copy">Not promises—just lovely possibilities, floating somewhere ahead.</p></div><div class="constellation-wrap"><div class="constellation"><svg class="constellation-svg" aria-hidden="true"></svg>${data.ideas.map((idea, i) => `<button class="star-card reveal" data-star-index="${i}" aria-expanded="false"><span class="star-number">${pad(i + 1)}</span><strong>${escapeHtml(idea[0])}</strong><p>${escapeHtml(idea[1])}</p><i aria-hidden="true">+</i></button>`).join('')}</div></div></section>
 <section class="section letter-section" id="letter"><div class="letter-wrap reveal"><p class="eyebrow">FROM ${escapeHtml((data.myName || 'A friend').toUpperCase())}, WITH LOVE AND CARE</p><h2>A letter for ${escapeHtml(data.herName || 'you')}</h2><p class="letter-intro">Open when you have a quiet moment.</p><button class="seal" id="open-letter" aria-expanded="false"><span>Open</span></button><div class="letter" id="letter-body">${escapeHtml(data.letter)}</div></div></section>
 <section class="section final"><div class="stars"></div><div class="final-inner reveal"><p class="eyebrow">ONE LAST LITTLE THING</p><h2>Until the next memory.</h2><p class="letterlike">${escapeHtml(data.finalMessage)}</p><p class="final-actions"><a href="#memories" class="button">Revisit our memories <span aria-hidden="true">↑</span></a><button class="ghost" id="restart">Start again</button></p></div></section>
 </main><div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Memory viewer"><div class="modal-inner"><button class="modal-close" id="modal-close" aria-label="Close memory viewer">×</button><img id="modal-img" alt=""><p class="modal-caption" id="modal-caption"></p></div></div><div class="toast" id="toast" role="status"></div>`;
@@ -51,16 +101,16 @@ try {
 } catch {}
 
 // A few interactive keepsakes are deliberately stored only on the visitor's device.
-const mapPins = (data.memoryMap || []).map((place, index) => `<button class="map-pin pin-${escapeHtml(place.kind || 'star')}" style="--x:${Number(place.x) || 50}%;--y:${Number(place.y) || 50}%" data-title="${escapeHtml(place.title)}" data-note="${escapeHtml(place.note)}" aria-expanded="false"><span class="pin-icon" aria-hidden="true">${place.kind === 'café' ? '&#9749;' : place.kind === 'garba' ? '&#10022;' : place.kind === 'heart' ? '&#9829;' : '&#10023;'}</span><span class="pin-label">${pad(index + 1)} - ${escapeHtml(place.title)}</span></button>`).join('');
-document.querySelector('#chapters')?.insertAdjacentHTML('afterend', `<section class="section memory-map-section" id="memory-map"><div class="section-heading reveal"><p class="eyebrow">PLACES WITH A STORY</p><h2>A map of our<br><em>little universe.</em></h2><p class="intro-copy">A few pins for the places that gave us something lovely to remember. Tap a pin to open its tiny story.</p></div><div class="memory-map reveal" aria-label="Map of memory places"><div class="map-orbit orbit-one"></div><div class="map-orbit orbit-two"></div>${mapPins}<div class="map-copy" aria-live="polite"><p class="eyebrow">CHOOSE A PIN</p><h3>Every place holds a feeling.</h3><p>Start anywhere on the map.</p></div></div></section>`);
+const mapPins = (data.memoryMap || []).map((place, index) => `<button class="map-pin pin-${escapeHtml(place.kind || 'star')}" style="--x:${Number(place.x) || 50}%;--y:${Number(place.y) || 50}%" data-title="${escapeHtml(place.title)}" data-note="${escapeHtml(place.note)}" data-kind="${escapeHtml(place.kind || 'star')}" data-num="${pad(index + 1)}" aria-expanded="${index === 0 ? 'true' : 'false'}"><span class="pin-icon" aria-hidden="true">${place.kind === 'café' ? '&#9749;' : place.kind === 'garba' ? '&#10022;' : place.kind === 'heart' ? '&#9829;' : '&#10023;'}</span><span class="pin-label">${pad(index + 1)} - ${escapeHtml(place.title)}</span></button>`).join('');
+document.querySelector('#chapters')?.insertAdjacentHTML('afterend', `<section class="section memory-map-section" id="memory-map"><div class="section-heading reveal"><p class="eyebrow">PLACES WITH A STORY</p><h2>A map of our<br><em>little universe.</em></h2><p class="intro-copy">A few pins for the places that gave us something lovely to remember. Tap any pin to open its tiny story.</p></div><div class="map-wrapper reveal"><div class="memory-map" aria-label="Map of memory places"><div class="map-orbit orbit-one"><div class="orbit-satellite sat-1"></div></div><div class="map-orbit orbit-two"><div class="orbit-satellite sat-2"></div></div>${mapPins}</div><div class="map-story-card" id="map-story-card" aria-live="polite"><div class="map-story-badge" id="map-story-badge" aria-hidden="true">&#9749;</div><div class="map-story-info"><p class="eyebrow" id="map-story-eyebrow">MEMORY PINNED ✦ PIN 01</p><h3 id="map-story-title">Café diaries</h3><p id="map-story-note">Coffee, colour, and the kind of conversations that make an afternoon disappear.</p></div></div></div></section>`);
 document.querySelector('#garba')?.insertAdjacentHTML('afterend', `<section class="section soundtrack-section" id="playlist"><div class="section-heading reveal"><p class="eyebrow">THREE SONGS, THREE FEELINGS</p><h2>A small <em>soundtrack</em><br>for the memories.</h2></div><div class="playlist-card reveal">${(data.playlist || []).map((song, index) => `<div class="playlist-track"><span>${pad(index + 1)}</span><div><h3>${escapeHtml(song.title)}</h3><p>${escapeHtml(song.artist)}</p></div><em>${escapeHtml(song.mood)}</em></div>`).join('')}</div><p class="playlist-note reveal">A little playlist card to play alongside the photos - add these to your favorite music app whenever you revisit this page.</p></section>`);
 document.querySelector('#letter')?.insertAdjacentHTML('beforebegin', `<section class="section keepsakes-section" id="guestbook"><div class="keepsakes-layout"><div class="section-heading reveal"><p class="eyebrow">A PRIVATE CORNER</p><h2>Leave a little<br><em>something back.</em></h2><p class="intro-copy">This guestbook and voice note live only in this browser. Nothing is sent anywhere.</p></div><div class="keepsake-cards reveal"><div class="guestbook-card"><p class="eyebrow">SHIVANI'S GUESTBOOK</p><label for="guestbook-message">A private reply</label><textarea id="guestbook-message" maxlength="600" placeholder="Write anything you want to keep here..." aria-describedby="guestbook-status"></textarea><div class="guestbook-actions"><span id="guestbook-status">Only this browser can see it.</span><button class="button" type="button" id="save-guestbook">Keep this note</button></div></div><div class="voice-card"><p class="eyebrow">A NOTE IN YOUR VOICE</p><h3>A handwritten audio message.</h3><p>Record a little 20-30 second voice note for this universe.</p><div class="voice-meter" aria-hidden="true"><span></span></div><p class="voice-status" id="voice-status">Ready when you are.</p><div class="voice-actions"><button class="button" type="button" id="record-voice">Record voice note</button><button class="ghost" type="button" id="play-voice" hidden>Play saved note</button><button class="ghost" type="button" id="delete-voice" hidden>Delete</button></div><audio id="voice-player" controls hidden></audio></div></div></div></section>`);
-document.body.insertAdjacentHTML('beforeend', `<div class="quiz-surprise" id="quiz-surprise" role="dialog" aria-modal="true" aria-labelledby="surprise-title" hidden><div class="surprise-stars" aria-hidden="true"></div><div class="surprise-card"><button class="modal-close" id="close-surprise" aria-label="Close surprise">&times;</button><p class="eyebrow">A LITTLE SURPRISE FOR YOU</p><h2 id="surprise-title">${escapeHtml(data.quizSurprise?.title || 'You found every little piece of the story.')}</h2><p>${escapeHtml(data.quizSurprise?.message || '')}</p><button class="button" type="button" id="keep-surprise">Keep shining &#10022;</button></div></div>`);
+document.body.insertAdjacentHTML('beforeend', `<div class="quiz-surprise" id="quiz-surprise" role="dialog" aria-modal="true" aria-labelledby="surprise-title" hidden><div class="surprise-stars" aria-hidden="true"></div><div class="surprise-card"><button class="modal-close" id="close-surprise" aria-label="Close surprise">&times;</button><p class="eyebrow">A LITTLE SURPRISE FOR YOU</p><h2 id="surprise-title">${escapeHtml(data.quizSurprise?.title || 'You found every little piece of the story.')}</h2><p>${escapeHtml(data.quizSurprise?.message || '')}</p><button class="button" type="button" id="keep-surprise">Keep shining &#10022;</button></div></div><div class="note-modal" id="note-modal" role="dialog" aria-modal="true" aria-labelledby="note-modal-title" hidden><div class="note-card"><button class="note-close" id="close-note" aria-label="Close note">&times;</button><div class="note-seal" aria-hidden="true"><span>&#10022;</span></div><p class="note-eyebrow" id="note-modal-eyebrow">NOTE 01 &#10022; A LITTLE REMINDER</p><h3 class="note-title" id="note-modal-title"></h3><div class="note-rule" aria-hidden="true"><span></span><i>&#10022;</i><span></span></div><div class="note-body" id="note-modal-body"></div><div class="note-actions"><button class="button small-button" type="button" id="fold-note">Keep this note &#10022;</button></div></div></div>`);
 
 document.querySelector('.nav-links')?.insertAdjacentHTML('afterbegin', '<a href="#memory-map">Map</a>');
 document.querySelectorAll('.memory[data-category]').forEach((memory, index) => {
   memory.dataset.memoryId = index;
-  memory.querySelector('.memory-image')?.insertAdjacentHTML('beforeend', '<button class="memory-reaction" type="button" aria-label="Add this memory to favorites" aria-pressed="false"><span aria-hidden="true">&#9825;</span></button>');
+  memory.querySelector('.card-photo-wrap, .polaroid-photo-frame, .memory-image')?.insertAdjacentHTML('beforeend', '<button class="memory-reaction" type="button" aria-label="Add this memory to favorites" aria-pressed="false"><span aria-hidden="true">&#9825;</span></button>');
 });
 const replayHeading = document.querySelector('.replay-heading');
 if (replayHeading && document.querySelectorAll('.video-grid video').length) {
@@ -121,10 +171,30 @@ document.documentElement.style.setProperty('--visit-star-y', `${Math.round(Math.
 document.documentElement.style.setProperty('--visit-sky-hue', `${Math.round((skySeed - .5) * 22)}deg`);
 document.documentElement.style.setProperty('--visit-star-opacity', `${(.35 + Math.random() * .25).toFixed(2)}`);
 
-$$('.map-pin').forEach(pin => pin.addEventListener('click', () => {
+$$('.map-pin').forEach(pin => pin.addEventListener('click', event => {
   $$('.map-pin').forEach(item => { item.classList.toggle('active', item === pin); item.setAttribute('aria-expanded', String(item === pin)); });
-  const copy = $('.map-copy');
-  if (copy) copy.innerHTML = `<p class="eyebrow">MEMORY PINNED</p><h3>${escapeHtml(pin.dataset.title || 'A little place')}</h3><p>${escapeHtml(pin.dataset.note || '')}</p>`;
+  const storyCard = $('#map-story-card');
+  const badge = $('#map-story-badge');
+  const eyebrow = $('#map-story-eyebrow');
+  const title = $('#map-story-title');
+  const note = $('#map-story-note');
+  if (badge) {
+    const kind = pin.dataset.kind;
+    badge.innerHTML = kind === 'café' ? '&#9749;' : kind === 'garba' ? '&#10022;' : kind === 'heart' ? '&#9829;' : '&#10023;';
+  }
+  if (eyebrow) eyebrow.textContent = `MEMORY PINNED ✦ PIN ${pin.dataset.num || '01'}`;
+  if (title) title.textContent = pin.dataset.title || 'A little place';
+  if (note) note.textContent = pin.dataset.note || '';
+  let x = event.clientX, y = event.clientY;
+  if (!x && !y) {
+    const r = pin.getBoundingClientRect();
+    x = r.left + r.width / 2;
+    y = r.top + r.height / 2;
+  }
+  spawnStardust(x, y, 14);
+  if (typeof anime !== 'undefined' && storyCard) {
+    anime({ targets: storyCard, translateY: [8, 0], opacity: [0.7, 1], duration: 320, easing: 'easeOutBack' });
+  }
 }));
 
 const safeGet = key => { try { return localStorage.getItem(key); } catch { return null; } };
@@ -251,15 +321,6 @@ $('#enter')?.addEventListener('click', exitIntro); $('#skip')?.addEventListener(
 const meter = $('.scroll-meter span'), nav = $('nav');
 function updateScrollDetails() { const max = document.documentElement.scrollHeight - window.innerHeight; if (meter) meter.style.height = `${max ? (window.scrollY / max) * 100 : 0}%`; nav?.classList.toggle('scrolled', window.scrollY > 28); }
 window.addEventListener('scroll', updateScrollDetails, { passive: true }); updateScrollDetails();
-document.addEventListener('click', event => {
-  const link = event.target.closest('a[href^="#"]');
-  const id = link?.getAttribute('href');
-  const target = id && id.length > 1 ? document.querySelector(id) : null;
-  if (!target) return;
-  event.preventDefault();
-  target.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-  history.replaceState(null, '', id);
-});
 if (window.location.hash) {
   window.setTimeout(() => {
     const target = document.querySelector(window.location.hash);
@@ -315,26 +376,409 @@ function openMemory(index) { const memory = memories[index]; if (!memory || !mod
 function closeMemory() { modal?.classList.remove('show'); $('#modal-video')?.remove(); if (modalImage) { modalImage.src = ''; modalImage.hidden = false; } document.body.style.overflow = ''; }
 function openVideoMemory(button) { const card = button.closest('.video-memory'); if (!card || !modal || !modalImage) return; const player = document.createElement('video'); player.id = 'modal-video'; player.controls = true; player.autoplay = true; player.muted = true; player.defaultMuted = true; player.playsInline = true; player.src = card.dataset.videoSrc; player.setAttribute('aria-label', card.dataset.videoTitle || 'Video memory'); modalImage.hidden = true; modalImage.after(player); $('#modal-caption').textContent = card.dataset.videoCaption || card.dataset.videoTitle || ''; modal.classList.add('show'); document.body.style.overflow = 'hidden'; $('#modal-close')?.focus(); }
 function moveMemory(step) { const visible = visibleMemories(); if (!visible.length) return; currentMemory = (currentMemory + step + visible.length) % visible.length; openMemory(memories.indexOf(visible[currentMemory])); }
+/* Stardust Particles Engine (Anime.js) */
+function spawnStardust(x, y, count = 14) {
+  if (typeof anime === 'undefined') return;
+  let container = document.getElementById('stardust-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'stardust-container';
+    document.body.appendChild(container);
+  }
+  const colors = ['#e7c978', '#f7e3aa', '#eaa3bd', '#b8a5e8', '#ffffff', '#ffd1dc'];
+  const sparks = [];
+  const originX = typeof x === 'number' && !isNaN(x) && x > 0 ? x : window.innerWidth / 2;
+  const originY = typeof y === 'number' && !isNaN(y) && y > 0 ? y : window.innerHeight / 2;
+  const numSparks = Math.min(count, 22);
+
+  for (let i = 0; i < numSparks; i++) {
+    const spark = document.createElement('div');
+    spark.className = 'stardust-spark';
+    const size = Math.random() * 7 + 4;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const isStar = Math.random() > 0.45;
+    spark.style.width = `${size}px`;
+    spark.style.height = `${size}px`;
+    spark.style.left = `${originX}px`;
+    spark.style.top = `${originY}px`;
+    spark.style.color = color;
+    spark.style.background = color;
+    if (isStar) {
+      spark.style.clipPath = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
+    } else {
+      spark.style.borderRadius = '50%';
+    }
+    container.appendChild(spark);
+    sparks.push(spark);
+  }
+
+  anime({
+    targets: sparks,
+    translateX: () => anime.random(-75, 75),
+    translateY: () => anime.random(-75, 75),
+    scale: [{ value: [0.2, 1.35], duration: 220, easing: 'easeOutBack' }, { value: 0, duration: 420, easing: 'easeInQuad' }],
+    rotate: () => anime.random(-360, 360),
+    opacity: [{ value: 1, duration: 80 }, { value: 0, duration: 420, delay: 180, easing: 'easeOutExpo' }],
+    easing: 'easeOutExpo',
+    duration: 650,
+    complete: () => {
+      sparks.forEach(s => s.remove());
+    }
+  });
+}
+
+// Global stardust activation on interactive taps
+document.addEventListener('click', event => {
+  const interactive = event.target.closest('button, a, .envelope, .star-card, .memory, .seal, .map-pin');
+  if (interactive && !event.target.closest('input, textarea, select')) {
+    let x = event.clientX, y = event.clientY;
+    if ((!x && !y) || x < 0 || y < 0) {
+      const r = interactive.getBoundingClientRect();
+      x = r.left + r.width / 2;
+      y = r.top + r.height / 2;
+    }
+    spawnStardust(x, y, 10);
+  }
+}, { passive: true });
+
+/* Double-Sided Memory Keepsake Cards Wiring */
 memories.forEach((memory, index) => {
-  memory.tabIndex = 0;
-  memory.setAttribute('role', 'button');
-  memory.setAttribute('aria-label', `Open ${memory.querySelector('h3')?.textContent || 'memory'}`);
-  memory.addEventListener('click', event => { if (!event.target.closest('button, a, input, select, textarea')) openMemory(index); });
-  memory.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('button, a, input, select, textarea')) { event.preventDefault(); openMemory(index); } });
+  // Flip buttons (both front Note button and back Photo button)
+  memory.querySelectorAll('.card-flip-btn, .polaroid-flip-btn').forEach(btn => {
+    btn.addEventListener('click', event => {
+      event.stopPropagation();
+      memory.classList.toggle('is-flipped');
+      const isFlipped = memory.classList.contains('is-flipped');
+      memory.querySelector('.card-back, .polaroid-back')?.setAttribute('aria-hidden', String(!isFlipped));
+      let x = event.clientX, y = event.clientY;
+      if (!x && !y) {
+        const r = btn.getBoundingClientRect();
+        x = r.left + r.width / 2;
+        y = r.top + r.height / 2;
+      }
+      spawnStardust(x, y, 12);
+      if (typeof anime !== 'undefined') {
+        anime({
+          targets: memory,
+          scale: [1, 1.02, 1],
+          duration: 350,
+          easing: 'easeOutQuad'
+        });
+      }
+    });
+  });
+
+  // Enlarge buttons
+  memory.querySelectorAll('.card-zoom-btn, .card-enlarge-btn, .polaroid-zoom, .polaroid-view-large-btn').forEach(btn => {
+    btn.addEventListener('click', event => {
+      event.stopPropagation();
+      openMemory(index);
+    });
+  });
+
+  // Clicking the photo frame directly
+  const photoFrame = memory.querySelector('.card-photo-wrap, .polaroid-photo-frame');
+  if (photoFrame) {
+    photoFrame.addEventListener('click', event => {
+      if (!event.target.closest('button')) openMemory(index);
+    });
+    photoFrame.addEventListener('keydown', event => {
+      if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('button')) {
+        event.preventDefault();
+        openMemory(index);
+      }
+    });
+  }
+
+  // Clicking the back of the card outside buttons flips it back
+  memory.querySelector('.card-back, .polaroid-back')?.addEventListener('click', event => {
+    if (!event.target.closest('button, a')) {
+      memory.classList.remove('is-flipped');
+      memory.querySelector('.card-back, .polaroid-back')?.setAttribute('aria-hidden', 'true');
+      spawnStardust(event.clientX, event.clientY, 8);
+    }
+  });
 });
+
 $('#modal-close')?.addEventListener('click', closeMemory); modal?.addEventListener('click', event => { if (event.target === modal) closeMemory(); });
 $$('.video-cinema').forEach(button => button.addEventListener('click', () => openVideoMemory(button)));
 document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMemory(); if (modal?.classList.contains('show') && event.key === 'ArrowRight') moveMemory(1); if (modal?.classList.contains('show') && event.key === 'ArrowLeft') moveMemory(-1); });
-function toast(message) { const box = $('#toast'); if (!box) return; box.textContent = message; box.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer = window.setTimeout(() => box.classList.remove('show'), 5600); }
-$$('.envelope').forEach(envelope => envelope.addEventListener('click', () => toast(`${envelope.dataset.title} — ${envelope.dataset.message}`)));
+function toast(message) { const box = $('#toast'); if (!box) return; box.textContent = message; box.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer = window.setTimeout(() => box.classList.remove('show'), 3800); }
+
+/* 3D Envelope Unfolding & Note Modal */
+function openNote(title, message, index) {
+  const modal = $('#note-modal');
+  if (!modal) return;
+  const num = String(index || 1).padStart(2, '0');
+  const eyebrow = $('#note-modal-eyebrow');
+  const titleEl = $('#note-modal-title');
+  const bodyEl = $('#note-modal-body');
+  if (eyebrow) eyebrow.textContent = `NOTE ${num} ✦ A LITTLE REMINDER`;
+  if (titleEl) titleEl.textContent = title || 'A little note';
+  if (bodyEl) bodyEl.textContent = message || '';
+  modal.hidden = false;
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+  const card = modal.querySelector('.note-card');
+  if (typeof anime !== 'undefined' && card) {
+    anime({
+      targets: card,
+      scale: [0.75, 1],
+      opacity: [0, 1],
+      translateY: [35, 0],
+      rotateZ: [-1.5, 0],
+      duration: 460,
+      easing: 'easeOutBack'
+    });
+  }
+  $('#close-note')?.focus();
+}
+
+function closeNote() {
+  const modal = $('#note-modal');
+  if (!modal) return;
+  const card = modal.querySelector('.note-card');
+  if (typeof anime !== 'undefined' && card) {
+    anime({
+      targets: card,
+      scale: [1, 0.85],
+      opacity: [1, 0],
+      translateY: [0, 20],
+      duration: 250,
+      easing: 'easeInQuad',
+      complete: () => {
+        modal.classList.remove('show');
+        modal.hidden = true;
+        document.body.style.overflow = '';
+      }
+    });
+  } else {
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+    window.setTimeout(() => { modal.hidden = true; }, 350);
+  }
+}
+
+function triggerEnvelopeOpen(envelope, clientX, clientY) {
+  if (envelope.classList.contains('is-opening')) return;
+  envelope.classList.add('is-opening');
+
+  let x = clientX, y = clientY;
+  if (!x && !y) {
+    const r = envelope.getBoundingClientRect();
+    x = r.left + r.width / 2;
+    y = r.top + r.height * 0.4;
+  }
+  spawnStardust(x, y, 18);
+
+  const flap = envelope.querySelector('.envelope-flap');
+  const letter = envelope.querySelector('.envelope-letter-peek');
+
+  if (typeof anime !== 'undefined' && flap && letter) {
+    anime({
+      targets: flap,
+      rotateX: [0, 180],
+      duration: 440,
+      easing: 'easeInOutSine'
+    });
+    anime({
+      targets: letter,
+      translateY: [0, -42],
+      scale: [0.95, 1.05],
+      duration: 480,
+      delay: 80,
+      easing: 'easeOutBack',
+      complete: () => {
+        openNote(envelope.dataset.title, envelope.dataset.message, envelope.dataset.noteIndex);
+        window.setTimeout(() => {
+          envelope.classList.remove('is-opening');
+          anime.set(flap, { rotateX: 0 });
+          anime.set(letter, { translateY: 0, scale: 1 });
+        }, 500);
+      }
+    });
+  } else {
+    openNote(envelope.dataset.title, envelope.dataset.message, envelope.dataset.noteIndex);
+    envelope.classList.remove('is-opening');
+  }
+}
+
+$('#close-note')?.addEventListener('click', closeNote);
+$('#fold-note')?.addEventListener('click', closeNote);
+$('#note-modal')?.addEventListener('click', event => { if (event.target === $('#note-modal')) closeNote(); });
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && !$('#note-modal')?.hidden) closeNote(); });
+
+$$('.envelope').forEach(envelope => {
+  envelope.addEventListener('click', event => {
+    triggerEnvelopeOpen(envelope, event.clientX, event.clientY);
+  });
+  envelope.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      triggerEnvelopeOpen(envelope);
+    }
+  });
+});
+
+/* Constellation Line Drawing & Celestial Orbits */
+function drawConstellationLines() {
+  const container = document.querySelector('.constellation');
+  const svg = document.querySelector('.constellation-svg');
+  if (!container || !svg) return;
+  const cards = [...container.querySelectorAll('.star-card')];
+  if (!cards.length) return;
+
+  const cRect = container.getBoundingClientRect();
+  if (cRect.width === 0 || cRect.height === 0) return;
+
+  svg.setAttribute('viewBox', `0 0 ${cRect.width} ${cRect.height}`);
+
+  const centers = cards.map(card => {
+    const r = card.getBoundingClientRect();
+    return {
+      x: r.left - cRect.left + r.width / 2,
+      y: r.top - cRect.top + r.height / 2
+    };
+  });
+
+  const connections = [
+    [0, 1], [1, 2], [2, 4], [4, 5], [3, 4], [0, 3], [1, 4]
+  ];
+
+  let pathData = '';
+  connections.forEach(([from, to]) => {
+    if (centers[from] && centers[to]) {
+      pathData += `M ${centers[from].x.toFixed(1)} ${centers[from].y.toFixed(1)} L ${centers[to].x.toFixed(1)} ${centers[to].y.toFixed(1)} `;
+    }
+  });
+
+  let nodesData = '';
+  centers.forEach((pt, i) => {
+    nodesData += `<circle class="constellation-node node-${i}" cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="4.5" />`;
+    nodesData += `<circle class="constellation-halo halo-${i}" cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="10" />`;
+  });
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="constellationGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f7e3aa" stop-opacity="0.85" />
+        <stop offset="50%" stop-color="#eaa3bd" stop-opacity="0.65" />
+        <stop offset="100%" stop-color="#b8a5e8" stop-opacity="0.85" />
+      </linearGradient>
+    </defs>
+    <path class="constellation-path" d="${pathData.trim()}" />
+    ${nodesData}
+  `;
+}
+
+let constellationAnimated = false;
+function animateConstellationLines() {
+  if (constellationAnimated || typeof anime === 'undefined') return;
+  const path = document.querySelector('.constellation-path');
+  if (!path) return;
+  constellationAnimated = true;
+  const pathLength = anime.setDashoffset(path);
+  anime({
+    targets: path,
+    strokeDashoffset: [pathLength, 0],
+    duration: 2200,
+    easing: 'easeInOutCubic'
+  });
+  anime({
+    targets: '.constellation-node',
+    scale: [0, 1],
+    opacity: [0, 1],
+    delay: anime.stagger(150, { from: 'center' }),
+    duration: 600,
+    easing: 'easeOutBack'
+  });
+  anime({
+    targets: '.constellation-halo',
+    scale: [0.8, 1.5],
+    opacity: [0.55, 0.1],
+    delay: anime.stagger(180),
+    duration: 2000,
+    direction: 'alternate',
+    loop: true,
+    easing: 'easeInOutSine'
+  });
+}
+
+const constellationObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      drawConstellationLines();
+      animateConstellationLines();
+    }
+  });
+}, { threshold: 0.15 });
+const constellationSec = document.querySelector('.constellation-section');
+if (constellationSec) constellationObserver.observe(constellationSec);
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  window.clearTimeout(resizeTimer);
+  resizeTimer = window.setTimeout(drawConstellationLines, 150);
+}, { passive: true });
+
+/* Celestial Orbits Animation (Anime.js) */
+if (typeof anime !== 'undefined') {
+  anime({
+    targets: '.orbit-one',
+    rotate: [0, 360],
+    duration: 36000,
+    easing: 'linear',
+    loop: true
+  });
+  anime({
+    targets: '.orbit-two',
+    rotate: [0, -360],
+    duration: 48000,
+    easing: 'linear',
+    loop: true
+  });
+}
+
 $$('.star-card').forEach(card => card.addEventListener('click', () => { card.classList.toggle('open'); card.setAttribute('aria-expanded', String(card.classList.contains('open'))); }));
 const secretStars = new Set();
 const secretMessage = document.createElement('aside');
 secretMessage.className = 'secret-message';
 secretMessage.innerHTML = '<p class="eyebrow">CONSTELLATION FOUND</p><p>Some people do not simply become memories. They become the reason certain days feel brighter.</p>';
 $('.constellation-section')?.append(secretMessage);
-$$('.star-card').forEach((card, index) => card.addEventListener('click', () => { secretStars.add(index); if (secretStars.size >= 3) { secretMessage.classList.add('found'); toast('A hidden constellation has appeared.'); } }));
-$('#open-letter')?.addEventListener('click', () => { $('#letter-body')?.classList.add('open'); $('#open-letter').setAttribute('aria-expanded', 'true'); $('#open-letter').style.display = 'none'; });
+$$('.star-card').forEach((card, index) => card.addEventListener('click', () => {
+  secretStars.add(index);
+  if (secretStars.size >= 3) {
+    secretMessage.classList.add('found');
+    toast('A hidden constellation has appeared.');
+    if (typeof anime !== 'undefined') {
+      anime({
+        targets: '.constellation-path',
+        stroke: ['#e7c978', '#ffffff', '#e7c978'],
+        strokeWidth: [1.6, 3.2, 1.8],
+        duration: 1200,
+        loop: 2,
+        easing: 'easeInOutQuad'
+      });
+    }
+  }
+}));
+
+$('#open-letter')?.addEventListener('click', () => {
+  $('#letter-body')?.classList.add('open');
+  $('#open-letter').setAttribute('aria-expanded', 'true');
+  $('#open-letter').style.display = 'none';
+  if (typeof anime !== 'undefined') {
+    anime({
+      targets: '#letter-body',
+      translateY: [24, 0],
+      opacity: [0, 1],
+      duration: 650,
+      easing: 'easeOutBack'
+    });
+  }
+});
+
 $('#restart')?.addEventListener('click', () => { sessionStorage.removeItem('universe-intro'); window.location.reload(); });
 function showQuizSurprise() {
   const surprise = $('#quiz-surprise');

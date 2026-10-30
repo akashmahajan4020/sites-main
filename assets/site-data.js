@@ -76,10 +76,10 @@ window.UNIVERSE_DATA = {
     message: 'Shivani, you make ordinary days feel like memories worth keeping. Here is to more laughter, more music, more cafés, and more beautiful little moments ahead. — Akash'
   },
   memoryMap: [
-    { kind: 'café', title: 'Café diaries', note: 'Coffee, colour, and the kind of conversations that make an afternoon disappear.', x: 24, y: 64 },
-    { kind: 'garba', title: 'Garba under the lights', note: 'Surat, Navratri, music, and a night that deserved to be remembered.', x: 70, y: 30 },
-    { kind: 'heart', title: 'The game-zone', note: 'A playful stop for laughs, replays, and a few very good selfies.', x: 56, y: 71 },
-    { kind: 'star', title: 'The little moments', note: 'All the unplanned snapshots that became part of the story.', x: 84, y: 62 }
+    { kind: 'café', title: 'Café diaries', note: 'Coffee, colour, and the kind of conversations that make an afternoon disappear.', x: 24, y: 54 },
+    { kind: 'garba', title: 'Garba under the lights', note: 'Surat, Navratri, music, and a night that deserved to be remembered.', x: 68, y: 26 },
+    { kind: 'heart', title: 'The game-zone', note: 'A playful stop for laughs, replays, and a few very good selfies.', x: 48, y: 70 },
+    { kind: 'star', title: 'The little moments', note: 'All the unplanned snapshots that became part of the story.', x: 80, y: 54 }
   ],
   playlist: [
     { title: 'Heeriye', artist: 'Jasleen Royal ft. Arijit Singh', mood: 'For warm, easy days' },
