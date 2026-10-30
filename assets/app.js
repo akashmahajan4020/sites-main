@@ -61,8 +61,28 @@ function memoryCard(item, index) {
   </div>
 </article>`;
 }
-function videoCard(item) {
-  return `<article class="memory video-memory reveal" data-video-src="${escapeHtml(item.src)}" data-video-title="${escapeHtml(item.title || 'Replay')}" data-video-caption="${escapeHtml(item.caption || '')}"><video controls muted playsinline preload="metadata" src="${escapeHtml(item.src)}" aria-label="${escapeHtml(item.caption || item.title || 'Video memory')}"></video><div class="meta"><h3>${escapeHtml(item.title || 'Replay')}</h3><small>${escapeHtml(item.caption || '')}</small><button class="video-cinema" type="button">Watch in cinema <span aria-hidden="true">↗</span></button></div></article>`;
+function videoCard(item, index) {
+  const padIndex = pad(index + 1);
+  return `<article class="memory video-memory reveal" data-video-src="${escapeHtml(item.src)}" data-video-title="${escapeHtml(item.title || 'Replay ' + padIndex)}" data-video-caption="${escapeHtml(item.caption || '')}" data-video-index="${index}">
+    <div class="video-preview-wrap" role="button" tabindex="0" aria-label="Watch ${escapeHtml(item.title || 'Replay')} in Cinema">
+      <video class="video-thumb" muted loop playsinline preload="metadata" src="${escapeHtml(item.src)}#t=0.5" aria-hidden="true"></video>
+      <div class="video-overlay" aria-hidden="true">
+        <span class="video-pill">CLIP ${padIndex}</span>
+        <div class="video-play-halo">
+          <span class="play-triangle">▶</span>
+        </div>
+        <span class="video-cinema-cue">Cinema Mode ↗</span>
+      </div>
+    </div>
+    <div class="video-card-meta">
+      <div class="video-meta-info">
+        <span class="video-category-tag">PERSONAL ARCADE ✦ CLIP ${padIndex}</span>
+        <h3>${escapeHtml(item.title || 'Replay ' + padIndex)}</h3>
+        <small>${escapeHtml(item.caption || 'A moment made for replaying.')}</small>
+      </div>
+      <button class="video-cinema-btn" type="button" aria-label="Open ${escapeHtml(item.title || 'Replay')} in cinema"><span aria-hidden="true">✦</span> Watch in Cinema</button>
+    </div>
+  </article>`;
 }
 function renderSite() {
   document.title = `Happy Birthday ${data.herName} | A Little Universe by ${data.myName}`;
@@ -70,7 +90,7 @@ function renderSite() {
   document.body.innerHTML = `
 <div class="intro" id="intro" aria-label="Welcome"><div class="stars"></div><button class="skip" id="skip">Skip intro</button><div class="intro-inner"><p class="eyebrow">${escapeHtml(universeLabel)}</p>${data.intro.map((line, i) => `<div class="line ${i === 0 ? 'active' : ''}">${escapeHtml(line)}</div>`).join('')}<div class="intro-actions"><button class="button" id="enter">Enter your little universe <span aria-hidden="true">✦</span></button></div></div></div>
 <div class="scroll-meter" aria-hidden="true"><span></span></div>
-<nav><a class="brand" href="#top">A little universe<span>.</span></a><div class="nav-links"><a href="#chapters">Chapters</a><a href="#memories">Memories</a><a href="#gamezone">Replay</a><a href="#letter">Letter</a></div><a class="nav-mark" href="#memories" aria-label="Jump to the memory gallery">01</a></nav>
+<nav><a class="brand" href="#top">A little universe<span>.</span></a><div class="nav-links"><a href="#chapters">Chapters</a><a href="#memories">Memories</a><a href="#gamezone">Replay</a><a href="#notes">Notes</a><a href="#letter">Letter</a></div><div class="nav-right"><button class="sky-mode-btn" id="sky-mode-toggle" type="button" aria-label="Switch night sky atmosphere" title="Switch celestial atmosphere"><span class="sky-sparkle" aria-hidden="true">✦</span><span id="sky-mode-label">Midnight</span></button><a class="nav-mark" href="#memories" aria-label="Jump to the memory gallery">01</a></div></nav>
 <header class="hero" id="top"><div class="stars"></div><div class="hero-aurora"></div><div class="hero-grain"></div><div class="hero-content reveal"><p class="eyebrow">${escapeHtml(universeLabel)}</p><h1>${escapeHtml(data.heroHeading)}</h1><p class="lead">${escapeHtml(data.heroText)}</p><p class="hero-detail">${escapeHtml(data.heroDetail)}</p><div class="hero-actions"><a class="button" href="#chapters">Discover the story <span aria-hidden="true">↓</span></a><a class="text-link" href="#memories">Open the gallery <span aria-hidden="true">↗</span></a></div><p class="scroll-prompt"><span></span>Scroll to begin</p></div><div class="hero-photo ${hero ? '' : 'empty'}"><div class="hero-photo-frame">${hero ? `<img src="${escapeHtml(hero.src)}" alt="${escapeHtml(hero.caption || hero.title || 'Featured memory')}">` : ''}</div><p class="hero-photo-caption">${escapeHtml(hero?.caption || hero?.title || 'A favorite memory, waiting to be added')}</p></div><div class="hero-index" aria-hidden="true"><span>01</span><i></i><span>∞</span></div></header>
 <main>
 <section class="section chapters-section" id="chapters"><div class="section-heading reveal"><p class="eyebrow">OUR JOURNEY SO FAR</p><h2>A few chapters<br>of <em>us.</em></h2><p class="intro-copy">A friendship told through the little moments, growing closeness, and memories still waiting to be made.</p></div><div class="timeline" aria-label="Story chapters">${data.chapters.map((chapter, i) => `<article class="chapter reveal"><span class="num">${pad(i + 1)}</span><div><p class="eyebrow">${escapeHtml(chapter[1])}</p><h3>${escapeHtml(chapter[0])}</h3><p>${escapeHtml(chapter[2])}</p></div></article>`).join('')}</div></section>
@@ -82,7 +102,7 @@ function renderSite() {
 <section class="section constellation-section"><div class="section-heading reveal"><p class="eyebrow">THE FUTURE CONSTELLATION</p><h2>Memories we haven't<br>made <em>yet.</em></h2><p class="intro-copy">Not promises—just lovely possibilities, floating somewhere ahead.</p></div><div class="constellation-wrap"><div class="constellation"><svg class="constellation-svg" aria-hidden="true"></svg>${data.ideas.map((idea, i) => `<button class="star-card reveal" data-star-index="${i}" aria-expanded="false"><span class="star-number">${pad(i + 1)}</span><strong>${escapeHtml(idea[0])}</strong><p>${escapeHtml(idea[1])}</p><i aria-hidden="true">+</i></button>`).join('')}</div></div></section>
 <section class="section letter-section" id="letter"><div class="letter-wrap reveal"><p class="eyebrow">FROM ${escapeHtml((data.myName || 'A friend').toUpperCase())}, WITH LOVE AND CARE</p><h2>A letter for ${escapeHtml(data.herName || 'you')}</h2><p class="letter-intro">Open when you have a quiet moment.</p><button class="seal" id="open-letter" aria-expanded="false"><span>Open</span></button><div class="letter" id="letter-body">${escapeHtml(data.letter)}</div></div></section>
 <section class="section final"><div class="stars"></div><div class="final-inner reveal"><p class="eyebrow">ONE LAST LITTLE THING</p><h2>Until the next memory.</h2><p class="letterlike">${escapeHtml(data.finalMessage)}</p><p class="final-actions"><a href="#memories" class="button">Revisit our memories <span aria-hidden="true">↑</span></a><button class="ghost" id="restart">Start again</button></p></div></section>
-</main><div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Memory viewer"><div class="modal-inner"><button class="modal-close" id="modal-close" aria-label="Close memory viewer">×</button><img id="modal-img" alt=""><p class="modal-caption" id="modal-caption"></p></div></div><div class="toast" id="toast" role="status"></div>`;
+</main><div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Memory viewer" hidden><div class="modal-inner"><button class="modal-close" id="modal-close" aria-label="Close memory viewer">×</button><img id="modal-img" alt=""><p class="modal-caption" id="modal-caption"></p></div></div><div class="toast" id="toast" role="status"></div>`;
 }
 
 renderSite();
@@ -103,9 +123,9 @@ try {
 // A few interactive keepsakes are deliberately stored only on the visitor's device.
 const mapPins = (data.memoryMap || []).map((place, index) => `<button class="map-pin pin-${escapeHtml(place.kind || 'star')}" style="--x:${Number(place.x) || 50}%;--y:${Number(place.y) || 50}%" data-title="${escapeHtml(place.title)}" data-note="${escapeHtml(place.note)}" data-kind="${escapeHtml(place.kind || 'star')}" data-num="${pad(index + 1)}" aria-expanded="${index === 0 ? 'true' : 'false'}"><span class="pin-icon" aria-hidden="true">${place.kind === 'café' ? '&#9749;' : place.kind === 'garba' ? '&#10022;' : place.kind === 'heart' ? '&#9829;' : '&#10023;'}</span><span class="pin-label">${pad(index + 1)} - ${escapeHtml(place.title)}</span></button>`).join('');
 document.querySelector('#chapters')?.insertAdjacentHTML('afterend', `<section class="section memory-map-section" id="memory-map"><div class="section-heading reveal"><p class="eyebrow">PLACES WITH A STORY</p><h2>A map of our<br><em>little universe.</em></h2><p class="intro-copy">A few pins for the places that gave us something lovely to remember. Tap any pin to open its tiny story.</p></div><div class="map-wrapper reveal"><div class="memory-map" aria-label="Map of memory places"><div class="map-orbit orbit-one"><div class="orbit-satellite sat-1"></div></div><div class="map-orbit orbit-two"><div class="orbit-satellite sat-2"></div></div>${mapPins}</div><div class="map-story-card" id="map-story-card" aria-live="polite"><div class="map-story-badge" id="map-story-badge" aria-hidden="true">&#9749;</div><div class="map-story-info"><p class="eyebrow" id="map-story-eyebrow">MEMORY PINNED ✦ PIN 01</p><h3 id="map-story-title">Café diaries</h3><p id="map-story-note">Coffee, colour, and the kind of conversations that make an afternoon disappear.</p></div></div></div></section>`);
-document.querySelector('#garba')?.insertAdjacentHTML('afterend', `<section class="section soundtrack-section" id="playlist"><div class="section-heading reveal"><p class="eyebrow">THREE SONGS, THREE FEELINGS</p><h2>A small <em>soundtrack</em><br>for the memories.</h2></div><div class="playlist-card reveal">${(data.playlist || []).map((song, index) => `<div class="playlist-track"><span>${pad(index + 1)}</span><div><h3>${escapeHtml(song.title)}</h3><p>${escapeHtml(song.artist)}</p></div><em>${escapeHtml(song.mood)}</em></div>`).join('')}</div><p class="playlist-note reveal">A little playlist card to play alongside the photos - add these to your favorite music app whenever you revisit this page.</p></section>`);
+document.querySelector('#garba')?.insertAdjacentHTML('afterend', `<section class="section soundtrack-section" id="playlist"><div class="section-heading reveal"><p class="eyebrow">THREE SONGS, THREE FEELINGS</p><h2>A small <em>soundtrack</em><br>for the memories.</h2></div><div class="playlist-card reveal">${(data.playlist || []).map((song, index) => `<div class="playlist-track" data-track-index="${index}" role="button" tabindex="0" aria-label="Play melody for ${escapeHtml(song.title)}"><span>${pad(index + 1)}</span><div><h3>${escapeHtml(song.title)}</h3><p>${escapeHtml(song.artist)}</p></div><div class="playlist-track-action"><em class="track-mood">${escapeHtml(song.mood)}</em><span class="track-play-pill"><span class="track-play-icon" aria-hidden="true">♫</span> Play chime</span></div></div>`).join('')}</div><p class="playlist-note reveal">Tap any song to hear its acoustic celestial chime. Add these to your favorite music app whenever you revisit this page.</p></section><section class="section wish-section" id="wish"><div class="celestial-wish-banner reveal"><div class="wish-banner-content"><p class="eyebrow">A SECRET KEPT IN THE STARS</p><h2>Make a wish upon<br>a <em>shooting star.</em></h2><p class="intro-copy">Some memories are made to keep. Some wishes are already floating ahead in the cosmos. Tap the star to see what happens.</p></div><button class="wish-trigger-btn" id="trigger-shooting-wish" type="button"><span class="wish-star-icon" aria-hidden="true">✦</span><span>Make a Wish</span><span class="wish-sparkle" aria-hidden="true">★</span></button></div></section>`);
 document.querySelector('#letter')?.insertAdjacentHTML('beforebegin', `<section class="section keepsakes-section" id="guestbook"><div class="keepsakes-layout"><div class="section-heading reveal"><p class="eyebrow">A PRIVATE CORNER</p><h2>Leave a little<br><em>something back.</em></h2><p class="intro-copy">This guestbook and voice note live only in this browser. Nothing is sent anywhere.</p></div><div class="keepsake-cards reveal"><div class="guestbook-card"><p class="eyebrow">SHIVANI'S GUESTBOOK</p><label for="guestbook-message">A private reply</label><textarea id="guestbook-message" maxlength="600" placeholder="Write anything you want to keep here..." aria-describedby="guestbook-status"></textarea><div class="guestbook-actions"><span id="guestbook-status">Only this browser can see it.</span><button class="button" type="button" id="save-guestbook">Keep this note</button></div></div><div class="voice-card"><p class="eyebrow">A NOTE IN YOUR VOICE</p><h3>A handwritten audio message.</h3><p>Record a little 20-30 second voice note for this universe.</p><div class="voice-meter" aria-hidden="true"><span></span></div><p class="voice-status" id="voice-status">Ready when you are.</p><div class="voice-actions"><button class="button" type="button" id="record-voice">Record voice note</button><button class="ghost" type="button" id="play-voice" hidden>Play saved note</button><button class="ghost" type="button" id="delete-voice" hidden>Delete</button></div><audio id="voice-player" controls hidden></audio></div></div></div></section>`);
-document.body.insertAdjacentHTML('beforeend', `<div class="quiz-surprise" id="quiz-surprise" role="dialog" aria-modal="true" aria-labelledby="surprise-title" hidden><div class="surprise-stars" aria-hidden="true"></div><div class="surprise-card"><button class="modal-close" id="close-surprise" aria-label="Close surprise">&times;</button><p class="eyebrow">A LITTLE SURPRISE FOR YOU</p><h2 id="surprise-title">${escapeHtml(data.quizSurprise?.title || 'You found every little piece of the story.')}</h2><p>${escapeHtml(data.quizSurprise?.message || '')}</p><button class="button" type="button" id="keep-surprise">Keep shining &#10022;</button></div></div><div class="note-modal" id="note-modal" role="dialog" aria-modal="true" aria-labelledby="note-modal-title" hidden><div class="note-card"><button class="note-close" id="close-note" aria-label="Close note">&times;</button><div class="note-seal" aria-hidden="true"><span>&#10022;</span></div><p class="note-eyebrow" id="note-modal-eyebrow">NOTE 01 &#10022; A LITTLE REMINDER</p><h3 class="note-title" id="note-modal-title"></h3><div class="note-rule" aria-hidden="true"><span></span><i>&#10022;</i><span></span></div><div class="note-body" id="note-modal-body"></div><div class="note-actions"><button class="button small-button" type="button" id="fold-note">Keep this note &#10022;</button></div></div></div>`);
+document.body.insertAdjacentHTML('beforeend', `<div class="quiz-surprise" id="quiz-surprise" role="dialog" aria-modal="true" aria-labelledby="surprise-title" hidden><div class="surprise-stars" aria-hidden="true"></div><div class="surprise-card"><button class="modal-close" id="close-surprise" aria-label="Close surprise">&times;</button><p class="eyebrow">A LITTLE SURPRISE FOR YOU</p><h2 id="surprise-title">${escapeHtml(data.quizSurprise?.title || 'You found every little piece of the story.')}</h2><p>${escapeHtml(data.quizSurprise?.message || '')}</p><button class="button" type="button" id="keep-surprise">Keep shining &#10022;</button></div></div><div class="note-modal" id="note-modal" role="dialog" aria-modal="true" aria-labelledby="note-modal-title" hidden><div class="note-card"><button class="note-close" id="close-note" aria-label="Close note">&times;</button><div class="note-seal" aria-hidden="true"><span>&#10022;</span></div><p class="note-eyebrow" id="note-modal-eyebrow">NOTE 01 &#10022; A LITTLE REMINDER</p><h3 class="note-title" id="note-modal-title"></h3><div class="note-rule" aria-hidden="true"><span></span><i>&#10022;</i><span></span></div><div class="note-body" id="note-modal-body"></div><div class="note-actions"><button class="button small-button" type="button" id="fold-note">Keep this note &#10022;</button></div></div></div><div class="cinema-modal" id="cinema-modal" role="dialog" aria-modal="true" aria-labelledby="cinema-title" hidden><div class="cinema-ambient-glow" aria-hidden="true"></div><div class="cinema-theater"><button class="cinema-close-btn" id="close-cinema" aria-label="Close cinema">&times;</button><div class="cinema-header"><div class="cinema-spark-row" aria-hidden="true"><span>✦</span><i></i><span>✦</span><i></i><span>✦</span></div><span class="cinema-eyebrow">THE REPLAY ROOM ✦ PERSONAL ARCHIVE</span><h2 id="cinema-title">Replay 01</h2><p id="cinema-caption">A moment made for replaying.</p></div><div class="cinema-screen-wrap"><video class="cinema-screen-video" id="cinema-video" controls playsinline preload="auto"></video></div><div class="cinema-controls-bar"><button class="cinema-step-btn" id="cinema-prev-btn" type="button" aria-label="Previous clip"><span>◀</span> Prev Clip</button><div class="cinema-clip-counter" id="cinema-counter">01 / 06</div><button class="cinema-step-btn" id="cinema-next-btn" type="button" aria-label="Next clip">Next Clip <span>▶</span></button></div></div></div><div class="wish-modal" id="wish-modal" role="dialog" aria-modal="true" aria-labelledby="wish-modal-title" hidden><div class="wish-card"><button class="wish-close" id="close-wish" aria-label="Close wish">&times;</button><div class="wish-star-seal" aria-hidden="true"><span>✦</span></div><p class="wish-eyebrow">A SECRET KEPT IN THE STARS</p><h2 class="wish-title" id="wish-modal-title">A wish for ${escapeHtml(data.herName || 'Shivani')}</h2><div class="wish-rule" aria-hidden="true"><span></span><i>★</i><span></span></div><div class="wish-body"><p>They say whenever a shooting star crosses the night sky, whatever you wish for begins to find its way to you.</p><p class="wish-highlight">"Here is a wish already written in the stars for you: may your days be full of laughter that makes your cheeks hurt, quiet peaceful moments, wonderful coffees, and moments as bright and beautiful as your smile."</p><div class="wish-sign">— With love &amp; care, Akash ✦</div></div><div class="wish-actions"><button class="button small-button" type="button" id="keep-wish-btn">Keep this wish &#10022;</button></div></div></div><div class="shooting-star-canvas" id="shooting-star-canvas" aria-hidden="true"></div>`);
 
 document.querySelector('.nav-links')?.insertAdjacentHTML('afterbegin', '<a href="#memory-map">Map</a>');
 document.querySelectorAll('.memory[data-category]').forEach((memory, index) => {
@@ -284,8 +304,18 @@ if (gallery && images.length) {
   const visitMemory = images[Math.floor(Math.random() * images.length)];
   const spotlight = document.createElement('aside');
   spotlight.className = 'memory-spotlight';
-  spotlight.innerHTML = `<p class="eyebrow">MEMORY OF THIS VISIT</p><div><img src="${escapeHtml(visitMemory.src)}" alt="${escapeHtml(visitMemory.caption || visitMemory.title || 'Featured memory')}"><div class="spotlight-copy"><span>Open this little moment</span><h3>${escapeHtml(visitMemory.title || 'A little memory')}</h3><p>${escapeHtml(visitMemory.caption || 'A moment worth keeping close.')}</p></div></div>`;
+  spotlight.innerHTML = `<p class="eyebrow">MEMORY OF THIS VISIT</p><div class="spotlight-media" role="button" tabindex="0" aria-label="View featured photo in full screen"><img src="${escapeHtml(visitMemory.src)}" alt="${escapeHtml(visitMemory.caption || visitMemory.title || 'Featured memory')}"><span class="spotlight-zoom-hint" aria-hidden="true">Enlarge photo ↗</span></div><div class="spotlight-copy"><span class="spotlight-category">OPEN THIS LITTLE MOMENT</span><h3>${escapeHtml(visitMemory.title || 'A little memory')}</h3><p>${escapeHtml(visitMemory.caption || 'A moment worth keeping close.')}</p></div>`;
   gallery.before(spotlight);
+
+  spotlight.querySelector('.spotlight-media')?.addEventListener('click', () => {
+    if (!modal || !modalImage) return;
+    modalImage.src = visitMemory.src;
+    modalImage.alt = visitMemory.caption || visitMemory.title || 'Featured memory';
+    $('#modal-caption').textContent = visitMemory.caption || visitMemory.title || '';
+    modal.hidden = false;
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  });
 
   const polaroidDesk = document.createElement('div');
   polaroidDesk.className = 'polaroid-desk';
@@ -319,7 +349,7 @@ if (hasSeenIntro || new URLSearchParams(window.location.search).has('skip-intro'
 else window.setTimeout(showIntroLine, 1350);
 $('#enter')?.addEventListener('click', exitIntro); $('#skip')?.addEventListener('click', exitIntro);
 const meter = $('.scroll-meter span'), nav = $('nav');
-function updateScrollDetails() { const max = document.documentElement.scrollHeight - window.innerHeight; if (meter) meter.style.height = `${max ? (window.scrollY / max) * 100 : 0}%`; nav?.classList.toggle('scrolled', window.scrollY > 28); }
+function updateScrollDetails() { const max = document.documentElement.scrollHeight - window.innerHeight; if (meter) meter.style.width = `${max > 0 ? (window.scrollY / max) * 100 : 0}%`; nav?.classList.toggle('scrolled', window.scrollY > 28); }
 window.addEventListener('scroll', updateScrollDetails, { passive: true }); updateScrollDetails();
 if (window.location.hash) {
   window.setTimeout(() => {
@@ -372,9 +402,60 @@ $('#gallery-search')?.addEventListener('input', filterGallery);
 $('#gallery-sort')?.addEventListener('change', event => { const gallery = $('#gallery'); if (!gallery) return; const direction = event.target.value === 'old' ? 1 : -1; [...gallery.children].sort((a, b) => direction * a.dataset.date.localeCompare(b.dataset.date)).forEach(card => gallery.append(card)); });
 const modal = $('#modal'), modalImage = $('#modal-img'); let currentMemory = -1;
 const visibleMemories = () => memories.filter(memory => !memory.hidden);
-function openMemory(index) { const memory = memories[index]; if (!memory || !modal || !modalImage) return; currentMemory = visibleMemories().indexOf(memory); modalImage.src = memory.dataset.src; modalImage.alt = memory.dataset.caption || 'Memory'; $('#modal-caption').textContent = memory.dataset.caption || ''; modal.classList.add('show'); document.body.style.overflow = 'hidden'; $('#modal-close')?.focus(); }
-function closeMemory() { modal?.classList.remove('show'); $('#modal-video')?.remove(); if (modalImage) { modalImage.src = ''; modalImage.hidden = false; } document.body.style.overflow = ''; }
-function openVideoMemory(button) { const card = button.closest('.video-memory'); if (!card || !modal || !modalImage) return; const player = document.createElement('video'); player.id = 'modal-video'; player.controls = true; player.autoplay = true; player.muted = true; player.defaultMuted = true; player.playsInline = true; player.src = card.dataset.videoSrc; player.setAttribute('aria-label', card.dataset.videoTitle || 'Video memory'); modalImage.hidden = true; modalImage.after(player); $('#modal-caption').textContent = card.dataset.videoCaption || card.dataset.videoTitle || ''; modal.classList.add('show'); document.body.style.overflow = 'hidden'; $('#modal-close')?.focus(); }
+function openMemory(index) { const memory = memories[index]; if (!memory || !modal || !modalImage) return; currentMemory = visibleMemories().indexOf(memory); modalImage.src = memory.dataset.src; modalImage.alt = memory.dataset.caption || 'Memory'; $('#modal-caption').textContent = memory.dataset.caption || ''; modal.hidden = false; modal.classList.add('show'); document.body.style.overflow = 'hidden'; $('#modal-close')?.focus(); }
+function closeMemory() { modal?.classList.remove('show'); $('#modal-video')?.remove(); if (modalImage) { modalImage.src = ''; modalImage.hidden = false; } document.body.style.overflow = ''; window.setTimeout(() => { if (modal) modal.hidden = true; }, 320); }
+let currentCinemaIndex = 0;
+function openCinema(index) {
+  const modal = $('#cinema-modal');
+  const video = $('#cinema-video');
+  const title = $('#cinema-title');
+  const caption = $('#cinema-caption');
+  const counter = $('#cinema-counter');
+  if (!modal || !video || !videos.length) return;
+
+  currentCinemaIndex = ((index % videos.length) + videos.length) % videos.length;
+  const current = videos[currentCinemaIndex];
+
+  if (title) title.textContent = current.title || `Replay ${pad(currentCinemaIndex + 1)}`;
+  if (caption) caption.textContent = current.caption || 'A moment made for replaying.';
+  if (counter) counter.textContent = `${pad(currentCinemaIndex + 1)} / ${pad(videos.length)}`;
+
+  video.src = current.src;
+  video.currentTime = 0;
+
+  modal.hidden = false;
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+  const playPromise = video.play();
+  if (playPromise) playPromise.catch(() => {});
+
+  if (typeof anime !== 'undefined') {
+    anime({
+      targets: '.cinema-theater',
+      scale: [0.88, 1],
+      opacity: [0, 1],
+      translateY: [24, 0],
+      duration: 420,
+      easing: 'easeOutBack'
+    });
+    spawnStardust(window.innerWidth / 2, window.innerHeight / 2, 16);
+  }
+}
+
+function closeCinema() {
+  const modal = $('#cinema-modal');
+  const video = $('#cinema-video');
+  if (!modal) return;
+  if (video) video.pause();
+  modal.classList.remove('show');
+  document.body.style.overflow = '';
+  window.setTimeout(() => { modal.hidden = true; }, 350);
+}
+
+function stepCinema(step) {
+  openCinema(currentCinemaIndex + step);
+}
 function moveMemory(step) { const visible = visibleMemories(); if (!visible.length) return; currentMemory = (currentMemory + step + visible.length) % visible.length; openMemory(memories.indexOf(visible[currentMemory])); }
 /* Stardust Particles Engine (Anime.js) */
 function spawnStardust(x, y, count = 14) {
@@ -427,6 +508,51 @@ function spawnStardust(x, y, count = 14) {
   });
 }
 
+/* Starlight Firefly Burst on Touch & Click */
+function spawnStarlightBurst(x, y, count = 7) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let container = document.getElementById('stardust-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'stardust-container';
+    document.body.appendChild(container);
+  }
+  const symbols = ['✦', '★', '•', '✧', '⋆'];
+  const colors = ['#f7e3aa', '#eaa3bd', '#fffdfa', '#b8a5e8', '#ffd1dc'];
+  const sparks = [];
+
+  for (let i = 0; i < count; i++) {
+    const spark = document.createElement('span');
+    spark.className = 'starlight-tap-spark';
+    spark.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    spark.style.color = colors[Math.floor(Math.random() * colors.length)];
+    spark.style.left = `${x}px`;
+    spark.style.top = `${y}px`;
+    container.appendChild(spark);
+    sparks.push(spark);
+  }
+
+  if (typeof anime !== 'undefined') {
+    anime({
+      targets: sparks,
+      translateX: () => anime.random(-48, 48),
+      translateY: () => anime.random(-55, 30),
+      scale: [{ value: [0.3, 1.2], duration: 180 }, { value: 0, duration: 320, easing: 'easeInQuad' }],
+      opacity: [{ value: 1, duration: 80 }, { value: 0, duration: 350, delay: 150 }],
+      duration: 550,
+      easing: 'easeOutQuad',
+      complete: () => sparks.forEach(s => s.remove())
+    });
+  } else {
+    setTimeout(() => sparks.forEach(s => s.remove()), 500);
+  }
+}
+
+document.addEventListener('pointerdown', event => {
+  if (event.target.closest('input, textarea, select, video, .cinema-screen-wrap')) return;
+  spawnStarlightBurst(event.clientX, event.clientY, 7);
+}, { passive: true });
+
 // Global stardust activation on interactive taps
 document.addEventListener('click', event => {
   const interactive = event.target.closest('button, a, .envelope, .star-card, .memory, .seal, .map-pin');
@@ -440,6 +566,44 @@ document.addEventListener('click', event => {
     spawnStardust(x, y, 10);
   }
 }, { passive: true });
+
+/* Celestial Atmosphere Switcher */
+const skyThemes = [
+  { id: 'theme-midnight', label: 'Midnight', toast: 'Atmosphere: Deep Cosmic Midnight 🌌' },
+  { id: 'theme-aurora', label: 'Aurora', toast: 'Atmosphere: Ethereal Aurora Borealis ✨' },
+  { id: 'theme-twilight', label: 'Rose Sky', toast: 'Atmosphere: Romantic Rose Twilight 🌸' }
+];
+let currentSkyIndex = 0;
+
+function setupSkyThemeToggle() {
+  const btn = $('#sky-mode-toggle');
+  const label = $('#sky-mode-label');
+  if (!btn) return;
+  
+  btn.addEventListener('click', () => {
+    currentSkyIndex = (currentSkyIndex + 1) % skyThemes.length;
+    const theme = skyThemes[currentSkyIndex];
+    document.body.classList.remove('theme-midnight', 'theme-aurora', 'theme-twilight');
+    if (theme.id !== 'theme-midnight') {
+      document.body.classList.add(theme.id);
+    }
+    if (label) label.textContent = theme.label;
+    toast(theme.toast);
+    
+    const r = btn.getBoundingClientRect();
+    spawnStardust(r.left + r.width / 2, r.top + r.height / 2, 14);
+    
+    if (typeof anime !== 'undefined') {
+      anime({
+        targets: '.hero-aurora',
+        opacity: [0.2, 0.7, 0.35],
+        duration: 900,
+        easing: 'easeInOutQuad'
+      });
+    }
+  });
+}
+setupSkyThemeToggle();
 
 /* Double-Sided Memory Keepsake Cards Wiring */
 memories.forEach((memory, index) => {
@@ -501,8 +665,189 @@ memories.forEach((memory, index) => {
 });
 
 $('#modal-close')?.addEventListener('click', closeMemory); modal?.addEventListener('click', event => { if (event.target === modal) closeMemory(); });
-$$('.video-cinema').forEach(button => button.addEventListener('click', () => openVideoMemory(button)));
-document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMemory(); if (modal?.classList.contains('show') && event.key === 'ArrowRight') moveMemory(1); if (modal?.classList.contains('show') && event.key === 'ArrowLeft') moveMemory(-1); });
+
+// Cinema modal event wiring
+$$('.video-preview-wrap, .video-cinema-btn').forEach(btn => {
+  btn.addEventListener('click', event => {
+    event.stopPropagation();
+    const card = btn.closest('.video-memory');
+    if (card) {
+      const idx = parseInt(card.dataset.videoIndex, 10);
+      openCinema(isNaN(idx) ? 0 : idx);
+    }
+  });
+});
+$('#close-cinema')?.addEventListener('click', closeCinema);
+$('#cinema-prev-btn')?.addEventListener('click', () => stepCinema(-1));
+$('#cinema-next-btn')?.addEventListener('click', () => stepCinema(1));
+$('#cinema-modal')?.addEventListener('click', event => {
+  if (event.target === $('#cinema-modal') || event.target.classList.contains('cinema-ambient-glow')) closeCinema();
+});
+
+// Shooting star wish event wiring
+function playCelestialWishChimes() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    const notes = [659.25, 783.99, 987.77, 1318.51, 1567.98];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+      gain.gain.setValueAtTime(0.0001, now + idx * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.06, now + idx * 0.12 + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.12 + 0.9);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + idx * 0.12);
+      osc.stop(now + idx * 0.12 + 1.0);
+    });
+  } catch {}
+}
+
+function openWishModal() {
+  const modal = $('#wish-modal');
+  if (!modal) return;
+  modal.hidden = false;
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  if (typeof anime !== 'undefined') {
+    anime({
+      targets: '.wish-card',
+      scale: [0.85, 1],
+      opacity: [0, 1],
+      translateY: [30, 0],
+      duration: 480,
+      easing: 'easeOutBack'
+    });
+  }
+}
+
+function closeWishModal() {
+  const modal = $('#wish-modal');
+  if (!modal) return;
+  modal.classList.remove('show');
+  document.body.style.overflow = '';
+  window.setTimeout(() => { modal.hidden = true; }, 350);
+}
+
+function triggerShootingStarWish(clientX, clientY) {
+  const canvas = $('#shooting-star-canvas');
+  if (!canvas) return;
+  const star = document.createElement('div');
+  star.className = 'shooting-star';
+  const startX = Math.random() * (window.innerWidth * 0.35);
+  const startY = Math.random() * (window.innerHeight * 0.3);
+  star.style.left = `${startX}px`;
+  star.style.top = `${startY}px`;
+  canvas.appendChild(star);
+
+  spawnStardust(clientX || window.innerWidth / 2, clientY || window.innerHeight / 2, 22);
+  playCelestialWishChimes();
+
+  if (typeof anime !== 'undefined') {
+    anime({
+      targets: star,
+      translateX: [0, window.innerWidth * 0.75],
+      translateY: [0, window.innerHeight * 0.55],
+      opacity: [{ value: [0, 1], duration: 150 }, { value: [1, 0], duration: 550, delay: 200 }],
+      duration: 850,
+      easing: 'easeOutQuad',
+      complete: () => {
+        star.remove();
+        openWishModal();
+      }
+    });
+  } else {
+    setTimeout(() => { star.remove(); openWishModal(); }, 600);
+  }
+}
+
+$('#trigger-shooting-wish')?.addEventListener('click', event => triggerShootingStarWish(event.clientX, event.clientY));
+$('#close-wish')?.addEventListener('click', closeWishModal);
+$('#keep-wish-btn')?.addEventListener('click', closeWishModal);
+$('#wish-modal')?.addEventListener('click', event => {
+  if (event.target === $('#wish-modal')) closeWishModal();
+});
+
+// Interactive acoustic soundtrack melodies for each track
+$$('.playlist-track').forEach((track, index) => {
+  track.addEventListener('click', event => {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = ctx.currentTime;
+      const melodies = [
+        [523.25, 659.25, 783.99, 1046.50, 783.99, 659.25], // Heeriye
+        [440.00, 554.37, 659.25, 880.00, 659.25, 554.37], // Kesariya
+        [392.00, 493.88, 587.33, 783.99, 587.33, 493.88]  // Rasiya
+      ];
+      const songNotes = melodies[index % melodies.length];
+      songNotes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + i * 0.18);
+        gain.gain.setValueAtTime(0.0001, now + i * 0.18);
+        gain.gain.exponentialRampToValueAtTime(0.045, now + i * 0.18 + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.18 + 0.55);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(now + i * 0.18);
+        osc.stop(now + i * 0.18 + 0.6);
+      });
+      spawnStardust(event.clientX, event.clientY, 12);
+      const title = track.querySelector('h3')?.textContent || 'Song';
+      toast(`♫ Playing melody for ${title}...`);
+    } catch {}
+  });
+});
+
+// Starlight touch & cursor trail (Anime.js)
+let lastTrailTime = 0;
+function createTouchSpark(x, y) {
+  const now = Date.now();
+  if (now - lastTrailTime < 65) return;
+  lastTrailTime = now;
+  const spark = document.createElement('div');
+  spark.className = 'cursor-stardust';
+  spark.style.left = `${x}px`;
+  spark.style.top = `${y}px`;
+  const colors = ['#e7c978', '#f7e3aa', '#eaa3bd', '#ffffff'];
+  spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+  document.body.appendChild(spark);
+  if (typeof anime !== 'undefined') {
+    anime({
+      targets: spark,
+      translateX: () => (Math.random() - 0.5) * 36,
+      translateY: () => (Math.random() - 0.5) * 36 + 12,
+      scale: [1, 0],
+      opacity: [0.85, 0],
+      duration: 650,
+      easing: 'easeOutQuad',
+      complete: () => spark.remove()
+    });
+  } else {
+    setTimeout(() => spark.remove(), 650);
+  }
+}
+window.addEventListener('pointermove', e => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (e.target.closest('input, textarea, select, .modal.show, .note-modal.show, .cinema-modal.show, .wish-modal.show')) return;
+  createTouchSpark(e.clientX, e.clientY);
+}, { passive: true });
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    closeMemory();
+    closeCinema();
+    closeWishModal();
+  }
+  const cinemaOpen = $('#cinema-modal')?.classList.contains('show');
+  if (cinemaOpen && event.key === 'ArrowRight') stepCinema(1);
+  if (cinemaOpen && event.key === 'ArrowLeft') stepCinema(-1);
+
+  if (modal?.classList.contains('show') && event.key === 'ArrowRight') moveMemory(1);
+  if (modal?.classList.contains('show') && event.key === 'ArrowLeft') moveMemory(-1);
+});
 function toast(message) { const box = $('#toast'); if (!box) return; box.textContent = message; box.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer = window.setTimeout(() => box.classList.remove('show'), 3800); }
 
 /* 3D Envelope Unfolding & Note Modal */
@@ -764,18 +1109,48 @@ $$('.star-card').forEach((card, index) => card.addEventListener('click', () => {
   }
 }));
 
-$('#open-letter')?.addEventListener('click', () => {
-  $('#letter-body')?.classList.add('open');
-  $('#open-letter').setAttribute('aria-expanded', 'true');
-  $('#open-letter').style.display = 'none';
-  if (typeof anime !== 'undefined') {
+$('#open-letter')?.addEventListener('click', event => {
+  const seal = $('#open-letter');
+  const letterBody = $('#letter-body');
+  if (!letterBody) return;
+  
+  let x = event.clientX, y = event.clientY;
+  if ((!x && !y || x < 0) && seal) {
+    const r = seal.getBoundingClientRect();
+    x = r.left + r.width / 2;
+    y = r.top + r.height / 2;
+  }
+  spawnStardust(x, y, 22);
+  playCelestialWishChimes();
+  
+  if (seal && typeof anime !== 'undefined') {
     anime({
-      targets: '#letter-body',
-      translateY: [24, 0],
-      opacity: [0, 1],
-      duration: 650,
-      easing: 'easeOutBack'
+      targets: seal,
+      scale: [1, 1.25, 0],
+      rotate: [0, -25],
+      opacity: [1, 0],
+      duration: 450,
+      easing: 'easeInOutBack',
+      complete: () => {
+        seal.style.display = 'none';
+        seal.setAttribute('aria-expanded', 'true');
+        letterBody.classList.add('open');
+        anime({
+          targets: letterBody,
+          translateY: [35, 0],
+          scale: [0.96, 1],
+          opacity: [0, 1],
+          duration: 700,
+          easing: 'easeOutBack'
+        });
+      }
     });
+  } else {
+    if (seal) {
+      seal.style.display = 'none';
+      seal.setAttribute('aria-expanded', 'true');
+    }
+    letterBody.classList.add('open');
   }
 });
 
